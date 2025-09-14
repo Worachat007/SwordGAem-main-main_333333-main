@@ -1,64 +1,367 @@
-# Survival_catparty_3-main
-การยืน
-<img width="1133" height="1029" alt="image" src="https://github.com/user-attachments/assets/38a4015e-9d28-4291-82c0-d510c8cb3d98" />
+อนิเมชันและการควบคุมตัวละคร
+อนิเมชันการยืน (Idle)
 
-# เพิ่ม Collider
-
-เลือกที่ตัวละครของเรา ให้เราทำการใส่ Rigidbody 2D และเพิ่ม Collider 2D เข้าไปให้กับวัตถุ โดย Collider จะใช้เป็น Capsule Collider 2D เพื่อแก้ปัญหาการชนกันของ Collider กรณีที่มีมุมของ Pixel ที่มองไม่เห็น และให้ปรับขนาดของ Collider ตัวละครของเรา
-
-ที่ Rigibody 2d ให้ทำการปรับ Constraints โดยกำหนด Freeze Rotation
-
-สร้างขึ้นทั้ง `Ground` และ `Player`
-
-# Input System
-
-ที่ Unity เปิด Package Manager และทำการติดตั้ง Input System 
-
-สร้างไฟล์ใหม่ ที่ Assets โดยทำการคลิ๊กขวา เลือก Create→ Input Actions ตั้งชื่อว่า Controls
-
-กดเปิดไฟล์ทีสร้างขึ้น โปรแกรมจะเปิดหน้าต่างใหม่ให้เรา ลักษณะเป็นสามคอลัมน์
-
-- Action Maps สำหรับกำหนดว่า อะไรจะใช้ Controles
-- Action
-- Properties
-
-ที่ Action สร้าง Action ใหม่ โดยกดปุ่ม + แล้วตั้งชื่อว่า Player จะปรากฏ Actions ใหม่ขึ้นมาที่หน้าคอลัมน์ Actions ตั้งชื่อว่า Jump
-
-ที่ด้านล่างของ Actions กดเลือกเพื่อทำการ Binding หรือการผูกคำสั่งนี้กับปุ่มที่เราต้องการ กดเลือก  Binding Path ให้เป็น Space และ ปุ่มเครื่องหมาย ขึ้น
-
-สร้าง Actions ใหม่ชื่อ Move กำหนด Action Type เป็น Value และ Control Type เป็น Any
-
-- ทำการเพิ่ม Negative/Positive Binding ให้กับ  Move ตั้งชื่อว่า LeftRight
-- ที่ด้านล่างของ Move จะมี Negative และ Positive ทำการ Binding คีย์ของปุ่ม โดย Negative เป็นปุ่ม `A` และ Positive เป็นปุ่ม `D`
-
-บันทึกการตั้งค่าที่ด้านบน `Save Asset`
-อนิเมะชั่นเดินหน้าถอยหลัง
-<img width="735" height="114" alt="image" src="https://github.com/user-attachments/assets/814fc93d-239d-4503-995c-b6304fca9cc3" />
+<img width="954" height="980" alt="image" src="https://github.com/user-attachments/assets/90d5a6d3-7968-49e9-8468-441a53ee0c52" />
 
 
+เมื่อสร้างอนิเมชัน Player_idle ให้กำหนดเป็นสีส้ม ซึ่งหมายความว่ามันคือ ค่าเริ่มต้น (Default State) ของ Animator เมื่อผู้เล่นไม่ได้กดปุ่มใด ๆ ตัวละครจะอยู่กับที่และเล่นอนิเมชัน Idle โดยอัตโนมัติ
+
+อนิเมชันการเคลื่อนไหว (เดินหน้า/ถอยหลัง)
+
+<img width="907" height="162" alt="image" src="https://github.com/user-attachments/assets/377bbc28-8c07-4172-bec4-2bc3ae059516" />
+
+สร้างอนิเมชันการเดินและเชื่อมโยงกับ Player_idle โดยทำ Transition ไป-กลับ
+
+เมื่อมีการเคลื่อนที่ → เปลี่ยนจาก Player_idle ไปยัง Move
+
+เมื่อหยุดนิ่ง → กลับจาก Move มายัง Player_idle ซึ่งเป็นสถานะเริ่มต้น
+
+การตั้งค่าการควบคุมการเคลื่อนที่
+
+<img width="909" height="391" alt="image" src="https://github.com/user-attachments/assets/7e7ee67e-9aca-4c0a-88d3-991add1dffcc" />
 
 
-การเดินหน้ากลับหลัง
-<img width="920" height="363" alt="image" src="https://github.com/user-attachments/assets/c2f8fed9-71b9-4c39-82d5-04534f78373b" />
+เปิด Input System แล้วเพิ่ม Action ใหม่:
+
+กดปุ่ม + ที่ Actions แล้วตั้งชื่อ Action ว่า Player จากนั้นจะมีคอลัมน์ Actions โผล่ขึ้นมา
+
+เพิ่ม Action ย่อยชื่อ Jump → Binding กับปุ่ม Space หรือปุ่ม ลูกศรขึ้น
+
+สร้าง Action ใหม่ชื่อ Move
+
+กำหนด Action Type เป็น Value
+
+ตั้งค่า Control Type เป็น Any
+
+เพิ่ม Composite Binding (1D Axis) → ตั้งชื่อว่า LeftRight
+
+Negative = ปุ่ม A
+
+Positive = ปุ่ม D
+
+เขียนสคริปต์ควบคุมการเดิน
+GatherInput.cs
+
+public class GatherInput : MonoBehaviour
+{
+    // Start is called once before the first execution of Update after the MonoBehaviour is create
+    private Control myControl;
+    public float valueX;
+    public bool JumpInput;
+
+    public void Awake()
+    {
+        myControl = new Control();
+    }
+    private void OnEnable()
+    {
+        myControl.Player.Move.performed += StartMove;
+        myControl.Player.Move.canceled += StopMove;
+        myControl.Player.Jump.performed += JumpStart;
+        myControl.Player.Jump.canceled += JumpStope;
+        myControl.Player.Enable();
+    }
+    public void OnDisable()
+    {
+        myControl.Player.Move.performed -= StartMove;
+        myControl.Player.Move.canceled -= StopMove;
+        myControl.Player.Jump.performed -= JumpStart;
+        myControl.Player.Jump.canceled -= JumpStope;
+        myControl.Player.Disable();
+        valueX = 0; 
+        //myControl.Disable();
+    }
+    private void StartMove(InputAction.CallbackContext ctx) {
+        valueX = ctx.ReadValue<float>();
+    }
+    private void StopMove(InputAction.CallbackContext ctx) {
+        valueX = 0;
+    }
+
+ไฟล์นี้ทำหน้าที่รับ Input ที่ผู้เล่นกด แล้วส่งต่อข้อมูลไปยังระบบการเคลื่อนไหว โดยใช้ Event เพื่อตรวจจับการเริ่ม/หยุดเคลื่อนที่ และคำสั่งกระโดด
+
+PlayerMoveControls.cs
+
+public class PlayerMoveControls : MonoBehaviour
+{
+    public float speed = 5f;
+    private int direction = 1;
+    public float jumpForce = 5;
+    private bool grounded = false;
+
+    private GatherInput gatherInput;
+    private Rigidbody2D Rigidbody2D;
+    private Animator animator;
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
+    {
+        gatherInput = GetComponent<GatherInput>();
+        Rigidbody2D = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        CheckStatus();
+        SetAnimatorValues();
+        Flip();
+        Rigidbody2D.linearVelocity = new Vector2(speed * gatherInput.valueX,
+            Rigidbody2D.linearVelocity.y);
+        JumpPlayer();
+    }
+    public Transform leftPoint;
+    public float rayLength;
+    public LayerMask groundLayer;
+    private void CheckStatus()
+    {
+        RaycastHit2D leftCheckHit = Physics2D.Raycast(leftPoint.position,
+            Vector2.down, rayLength, groundLayer);
+       
+        grounded = leftCheckHit;
+        // print(grounded);
+    }
+    private void JumpPlayer() {
+        if (gatherInput.JumpInput) {
+            Rigidbody2D.linearVelocity = new Vector2(gatherInput.valueX * speed, jumpForce);
+        }
+        gatherInput.JumpInput = false;
+    }
+    private void SetAnimatorValues()
+    {
+        animator.SetFloat("speed", Mathf.Abs(Rigidbody2D.linearVelocityX));
+        animator.SetFloat("Vspeed", Rigidbody2D.linearVelocityY);
+        animator.SetBool("Ground", grounded);
+    }
+    /// <summary>
+    /// for flip character
+    /// </summary>
+    private void Flip() {
+        if (gatherInput.valueX * direction < 0) {
+            //to flip character
+            transform.localScale = new Vector3(-transform.localScale.x, 1, 1);
+            //update direction
+            direction *= -1;
+        }
+    }
+}
+
+ไฟล์นี้ใช้สำหรับแปลงค่าที่ได้จาก GatherInput.cs มาเป็นการเคลื่อนไหวจริง ๆ ของตัวละคร เช่น การเดินไปซ้าย ขวา หรือการกระโดด
+
+มีตัวแปร direction เพื่อกำหนดทิศทางของ Sprite
+
+ค่า บวก = ตัวละครหันขวา (ทิศทางปกติ)
+
+ค่า ลบ = ตัวละครหันซ้าย (โดยการกลับด้าน Scale ของแกน X)
+
+สร้างฟังก์ชัน Flip() เพื่อตรวจสอบทิศทางและสลับด้านของตัวละครโดยแก้ค่า localScale.x ให้เป็นค่าติดลบ
+
+ฟังก์ชันนี้จะถูกเรียกใช้ภายใน Update() ซึ่งจะทำงานทุกเฟรม ทำให้ทิศทางของตัวละครอัปเดตแบบเรียลไทม์
+
+ระบบการกระโดด
+ฟังก์ชันการกระโดดใน GatherInput.cs
 
 
+		//...
+    public bool jumpInput;
+    
+    private void OnEnable()
+    {
+		    //...
+        myControl.Player.Jump.performed += JumpStart;
+        myControl.Player.Jump.canceled += JumpStop;
+
+        myControl.Player.Enable();
+    } 
+
+    private void OnDisable()
+    {
+		    //...
+        myControl.Player.Jump.performed -= JumpStart;
+        myControl.Player.Jump.canceled -= JumpStop;
+
+        myControl.Player.Disable();
+    }
+   
+    private void JumpStart(InputAction.CallbackContext ctx)
+    {
+        jumpInput = true;
+    }
+    private void JumpStop(InputAction.CallbackContext ctx)
+    {
+        jumpInput = false;
+    }
+}
+
+เมื่อผู้เล่นกดปุ่มกระโดด ระบบจะเปลี่ยนสถานะของตัวละคร และส่งค่าการกระโดดไปยัง PlayerMoveControls
+
+เพิ่มการเคลื่อนไหวแนวดิ่งใน PlayerMoveControls.cs
+
+public class PlayerMoveControls : MonoBehaviour
+{
+		//...
+    public float jumpForce;
+    //...
+    private void FixedUpdate()
+    {
+        Move();
+        JumpPlayer();
+    }
+		//...
+    private void JumpPlayer() 
+    {
+        if (gatherInput.jumpInput)
+        {
+            rigidbody2D.velocity = new Vector2(gatherInput.valueX * speed, jumpForce);
+        }
+        gatherInput.jumpInput = false;
+    }
+}
+
+ทำให้ตัวละครเคลื่อนที่ขึ้นด้านบนตามแกน Y เพื่อให้ดูเหมือนการกระโดดจริง
+
+อนิเมชันการกระโดด
+
+<img width="1719" height="422" alt="image" src="https://github.com/user-attachments/assets/ff518e09-40ed-4217-bee6-ee7497e6b3f6" />
 
 
+ดับเบิ้ลคลิกที่ Blend Tree ของ Animator จะเห็นว่ามี Blend Type = 1D (มิติเดียว)
+
+เดิมเรามีตัวแปร Speed
+
+เพิ่มตัวแปรใหม่ชื่อ vSpeed (float) เพื่อตรวจจับความเร็วแนวดิ่ง
+
+จากนั้นปรับ Blend Tree ให้ใช้ vSpeed เป็น Parameter และเพิ่ม Motion 3 ค่า:
+
+Jump Down
+
+Jump Peak
+
+Jump Up
+
+ระบบความเสียหายและการตาย
+
+<img width="341" height="297" alt="image" src="https://github.com/user-attachments/assets/23234ba7-0967-43a8-854c-214e7c110b00" />
 
 
-การกระโดด
-<img width="1726" height="475" alt="image" src="https://github.com/user-attachments/assets/d26c6675-ead3-47ae-af9d-698dcd3b28fb" />
+PlayerStats.cs
+
+สร้าง Empty Object ชื่อ PlayerStats ไว้ในตัวละคร และเพิ่ม Polygon Collider 2D ที่เปิด Is Trigger เพื่อใช้ตรวจสอบการโดนโจมตี (ไม่เกี่ยวกับการยืนบนพื้น) จากนั้นสร้าง Layer PlayerStats
+
+เขียนสคริปต์ PlayerStats.cs:
+
+using UnityEngine;
+using System.Collections;
+
+public class PlayerStats : MonoBehaviour
+{
+    public float maxHealth;
+    public float health;
+
+    private bool canTakeDamage = true;
+
+    void Start()
+    {
+        health = maxHealth; // เริ่มเกมมาด้วยเลือดเต็ม
+    }
+
+    public void TakeDamage(float damage)
+    {
+        if(!canTakeDamage) return; // ถ้ากำลังอยู่ในช่วงกันดาเมจ จะไม่รับความเสียหายเพิ่ม
+
+        health -= damage;
+        if(health <= 0)
+        {
+            // เมื่อตาย ปิด Collider และหยุดควบคุมการเคลื่อนไหว
+            GetComponent<PolygonCollider2D>().enabled = false;
+            GetComponentInParent<GatherInput>().DisableControls();
+            Debug.Log("Player is dead");
+        }
+
+        StartCoroutine(DamagePrevention());
+    }
+
+    private IEnumerator DamagePrevention()
+    {
+        canTakeDamage = false;
+        yield return new WaitForSeconds(0.15f); // กันดาเมจชั่วคราว 0.15 วิ
+        if (health > 0) canTakeDamage = true;
+    }
+}
 
 
-บาทเจ็บ
-<img width="198" height="75" alt="image" src="https://github.com/user-attachments/assets/158640a1-df61-459c-bfe7-e306dacfa305" />
+📌 สรุป
 
-หนาม
+maxHealth = ค่าพลังชีวิตสูงสุด
 
-<img width="702" height="699" alt="image" src="https://github.com/user-attachments/assets/53c1d646-de40-4173-a5ca-526c88908b94" />
+health = ค่าพลังชีวิตปัจจุบัน
+
+TakeDamage() = หักพลังชีวิต และถ้าเลือดหมด → ปิดการควบคุมตัวละคร
+
+ใช้ Coroutine เพื่อเว้นระยะรับดาเมจ ไม่ให้ถูกหักเลือดรัว ๆ ภายในเสี้ยววินาที
+
+การหยุดควบคุมเมื่อ Player ตาย
+
+เพิ่มฟังก์ชันใน GatherInput.cs:
+
+public void DisableControls() 
+{
+    myControl.Player.Move.performed -= StartMove;
+    myControl.Player.Move.canceled -= StopMove;
+
+    myControl.Player.Jump.performed -= JumpStart;
+    myControl.Player.Jump.canceled -= JumpStop;
+
+    myControl.Player.Disable();
+    valueX = 0;
+}
+
+การสร้าง Spike (วัตถุที่ทำดาเมจ)
+
+เพิ่ม Sprite (เช่น Sword) ลงในฉาก → เปลี่ยนชื่อเป็น Spike
+
+ใส่ Rigidbody2D และตั้งค่า Body Type = Kinematic
+
+เพิ่ม Polygon Collider 2D และเปิด Is Trigger
+
+สร้าง Layer EnemyAttack แล้วกำหนดให้ Spike อยู่ในเลเยอร์นี้
+
+ไปที่ Project Settings → Physics 2D → ให้ PlayerStats สามารถชนกับ EnemyAttack
+
+Spikes.cs
+using UnityEngine;
+
+public class Spikes : MonoBehaviour
+{
+    public float damage = 10f;
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("PlayerStats"))
+        {
+            Debug.Log("Player hit by spikes");
+            collision.GetComponent<PlayerStats>().TakeDamage(damage);
+        }
+    }
+}
 
 
+📌 สรุป
 
+damage = ค่า Damage ที่ Spike สร้างได้
 
-ตาย
-<img width="230" height="129" alt="image" src="https://github.com/user-attachments/assets/30da6975-55f8-430b-b93b-52999d4b2fc4" />
+ใช้ OnTriggerEnter2D() ตรวจจับการชนกับ PlayerStats
+
+ถ้า Player ชน Spike → เรียก TakeDamage() เพื่อลดพลังชีวิต
+
+ภาพรวมการทำงาน
+
+ตัวละครมีระบบเลือด (PlayerStats)
+
+เมื่อชน Spike → เลือดลดลง
+
+ถ้าเลือดหมด → ตัวละครหยุดเคลื่อนไหวและขึ้นข้อความว่า Player is dead
+
+ใช้ Coroutine กันไม่ให้โดน Damage ซ้ำรัว ๆ
+
+สามารถสังเกตการทำงานได้จาก Console
